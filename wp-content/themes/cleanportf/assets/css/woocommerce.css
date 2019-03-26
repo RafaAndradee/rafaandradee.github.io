@@ -1,0 +1,271 @@
+
+
+
+
+
+
+.shop {
+    height: auto;
+    padding: 12vh 0 0 0;
+    background-color: #fff;
+    font-family: Oswald, sans-serif;
+}
+
+.shop p{
+    margin: 0 0 0 0;
+    padding: 0 0 10px 0;
+}
+
+.shop h1{
+    display: none;
+}
+
+
+
+.products{
+    height: 100%;
+    display: flex;
+    list-style: none;
+    margin: 0;
+    flex-wrap: wrap;
+    padding: 6vh 0 0 0;
+} 
+
+.products li {
+    float: left;
+    padding: 0;
+    position: relative;
+    margin: 0 3.4% 0% 3.4% !important;
+    flex-wrap: wrap;
+    width: 26%;
+}
+
+
+.shop li {
+    /*! float: left; */
+    padding: 0;
+    position: relative;
+    margin: 0 3.4% 20px 3.4% !important;
+    flex-wrap: wrap;
+    width: 26%;
+}
+
+
+
+.carrinho {
+    width: 100%;
+}
+
+.carrinho img {
+    width: 32px;
+}
+
+
+.attachment-shop_catalog {
+    width: 100%;
+    height: auto;
+    margin: 0 0 1em;
+    box-shadow: none;
+}
+
+
+.price {
+    display: block;
+    width: 100%;
+    text-align: left;
+    color: #303030;
+    margin: 0 0 13px 0;
+    font-size: 1.4rem;
+    font-weight: 400;
+}
+
+
+.add_to_cart_button{
+    display: block;
+}
+
+
+
+/*/////// CARRINHO ///////*/ 
+
+.woocommerce-cart-form__cart-item td {
+    margin: 5px 5px 10px 5px;
+}
+
+.shop_table {
+    margin: 6px 0 30px 0;
+}
+
+.woocommerce-loop-product__title {
+    font-size: 1.4rem;
+    text-align: left;
+    color: #292929;
+    text-transform: inherit;
+    font-weight: 400;
+}
+
+
+.add_to_cart_button {
+    display: block;
+    border-style: solid;
+    margin: 0 30%;
+    color: #fffdfd;
+    border-width: 1px;
+    background-color: #47467E;
+    text-align: center;
+    text-transform: uppercase;
+    height: 1.7rem;
+    transition-duration: 1s;
+}
+
+
+.add_to_cart_button:hover {
+
+    background-color: #fff;
+}
+
+
+.botaoLoja {
+    padding: 1vh 0 1vh 0;
+    background-color: #CAAC1B;
+    margin: 5vh 0 0 0px;
+}
+
+
+
+.woocommerce-product-gallery__wrapper {
+    width: 100%;
+    display: inline-flex;
+}
+
+
+.woocommerce-product-gallery {
+    width: 100%;
+}
+
+.woocommerce-product-gallery__image{
+    width: 25%;
+}
+
+.attachment-shop_single {
+    width: 92%;
+    height: auto;
+}
+
+
+
+.summary.entry-summary{
+    display: block;
+    width: 100%;
+    text-align: left;
+    list-style: none;
+}
+
+.tabs.wc-tabs{
+    
+   display: none;
+}
+
+
+.upsells{
+    display: block;
+}
+
+.upsells li {
+    padding: 0;
+    margin: 0 4.4% 40px 4.4% !important;
+    width: 15%;
+}
+
+
+.woocommerce-Tabs-panel h2{
+    font-size: 26px;
+    text-align: left;
+}
+
+.col-1 {
+    max-width: 100%;
+    width: 100%;
+    text-align: left;
+    display: block;
+}
+
+#customer_details input:not([type="range"]){
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    width: 50%;
+
+}
+
+.form-row {
+    display: block;
+}
+
+.col-1 label {
+    display: block;
+    margin-bottom: .5rem;
+}
+
+textarea {
+    overflow: auto;
+    resize: vertical;
+    width: 80vh;
+}
+
+.woocommerce-additional-fields {
+    display: inline-block;
+    text-align: left;
+}
+
+
+.wc_payment_methods{
+    list-style: none;
+}
+
+
+.checkout-button {
+    border-style: solid;
+    color: #fff;
+    border-width: 1px;
+    background-color: #0e0d3e;
+    padding: 1vh;
+    text-transform: uppercase;
+}
+
+.checkout-button:hover {
+    color: #fff !important;
+}
+
+
+@media (max-width: 800px) {
+    .shop li{
+        width: 43.2%;
+    }
+    
+    input:not([type="range"]){
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    width: 80%;
+    
+    }
+    .woocommerce-cart-form__cart-item {
+    flex-wrap: wrap;
+    display: inline-flex;
+    }
+    
+    
+}
+
+@media (max-height: 768px){
+
+}
+
+@media (max-width: 450px) {
+
+
+    .shop li{
+        width: 100%;
+    }
+}
+
+
