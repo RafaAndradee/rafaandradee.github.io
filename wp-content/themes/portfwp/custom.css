@@ -1,0 +1,63 @@
+.navbar-brand {
+
+text-transform: uppercase;
+color: #337ab7 !important;
+font-family: 'Oswald', sans-serif;
+font-size: 30px;
+
+}
+
+
+.navbar-header{
+
+
+
+
+}
+
+.navbar-default .navbar-nav a{
+
+
+color: #41e1a8;
+text-transform: uppercase;
+
+}
+
+.products{
+
+    margin-top: 3vh;
+    margin-bottom: 10px;
+    text-decoration: none;
+    list-style: none;
+    display: inline-flex;
+
+}
+
+
+
+.products li{
+
+padding-right: 10px;
+
+}
+
+
+.products img{
+
+	width: 100%;
+	height: auto;
+
+}
+
+h2.woocommerce-loop-product__title{
+
+    font-size: 25px !important;
+    text-align: center !important;
+
+}
+
+
+
+
+
+
