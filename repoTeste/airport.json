@@ -1,11 +1,4 @@
-<?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-echo json_encode($data);
- ?>
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body>[{"value":"BHZ
+[{"value":"BHZ
  - BELO HORIZONTE - TODOS AEROPORTOS","label":"BHZ - BELO HORIZONTE -
 TODOS AEROPORTOS"},{"value":"BER - BERLIN - TODOS
 AEROPORTOS","label":"BER - BERLIN - TODOS AEROPORTOS"},{"value":"BUH -
