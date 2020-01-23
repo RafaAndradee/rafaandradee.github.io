@@ -12,7 +12,7 @@ jQuery( function( $ ) {
 		 */
 		init: function() {
 			$( document.body )
-				.on( 'click', '.correios-tracking-code a.tracking-code-link', this.openTrackingLink );
+				.on( 'click', '.correios-tracking-code a', this.openTrackingLink );
 		},
 
 		/**
@@ -27,7 +27,7 @@ jQuery( function( $ ) {
 			$( '#wc-correios-tracking__form' ).remove();
 
 			var code  = $( this ).text();
-			var form = '<form id="wc-correios-tracking__form" method="post" action="https://www2.correios.com.br/sistemas/rastreamento/resultado.cfm" target="_blank" rel="nofollow noopener noreferrer" style="display: none;">';
+			var form = '<form id="wc-correios-tracking__form" method="post" action="http://www2.correios.com.br/sistemas/rastreamento/resultado_semcontent.cfm" target="_blank" rel="nofollow noopener noreferrer" style="display: none;">';
 			form += '<input type="hidden" name="objetos" value="' + code + '" />';
 			form += '</form>';
 

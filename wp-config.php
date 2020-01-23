@@ -24,15 +24,15 @@ define('DB_NAME', 'id1659970_rafaportf');
 
 
 /** MySQL database username */
-define('DB_USER', 'id1659970_rafaportf');
+define('DB_USER', 'root');
 
 
 /** MySQL database password */
-define('DB_PASSWORD', 'antidesign92');
+define('DB_PASSWORD', '');
 
 
 /** MySQL hostname */
-define('DB_HOST', 'localhost:3306');
+define('DB_HOST', 'localhost');
 
 
 /** Database Charset to use in creating database tables. */
@@ -91,7 +91,7 @@ $table_prefix  = 'wp_';
  *
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
-define('WP_DEBUG', false);
+define('WP_DEBUG', true);
 
 /* That's all, stop editing! Happy blogging. */
 
