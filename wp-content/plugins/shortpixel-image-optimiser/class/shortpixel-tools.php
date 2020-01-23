@@ -11,9 +11,31 @@ class ShortPixelTools {
         }
         return $data;
     }*/
-    
+
+    /** Find if a certain plugin is active
+    * @param String $plugin The name of plugin being searched for
+    * @return Boolean Active or not
+    */
+    public static function shortPixelIsPluginActive($plugin) {
+        $activePlugins = apply_filters( 'active_plugins', get_option( 'active_plugins', array()));
+        if ( is_multisite() ) {
+            $activePlugins = array_merge($activePlugins, get_site_option( 'active_sitewide_plugins'));
+        }
+        return in_array( $plugin, $activePlugins);
+    }
+
     public static function snakeToCamel($snake_case) {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $snake_case)));
+    }
+
+    public static function getPluginPath()
+    {
+       return plugin_dir_path(SHORTPIXEL_PLUGIN_FILE);
+    }
+
+    public static function namespaceit($name)
+    {
+      return '\ShortPixel\\'  . $name;
     }
 
     public static function requestIsFrontendAjax()
@@ -39,13 +61,50 @@ class ShortPixelTools {
         //If no checks triggered, we end up here - not an AJAX request.
         return false;
     }
-    
+
+    /** Function to convert dateTime object to a date output
+    *
+    * Function checks if the date is recent and then uploads are friendlier message. Taken from media library list table date function
+    * @param DateTime $date DateTime object
+    **/
+    public static function format_nice_date( $date ) {
+
+    if ( '0000-00-00 00:00:00' === $date->format('Y-m-d ') ) {
+        $h_time = '';
+    } else {
+        $time   = $date->format('U'); //get_post_time( 'G', true, $post, false );
+        if ( ( abs( $t_diff = time() - $time ) ) < DAY_IN_SECONDS ) {
+            if ( $t_diff < 0 ) {
+                $h_time = sprintf( __( '%s from now' ), human_time_diff( $time ) );
+            } else {
+                $h_time = sprintf( __( '%s ago' ), human_time_diff( $time ) );
+            }
+        } else {
+            $h_time = $date->format( 'Y/m/d' );
+        }
+    }
+
+    return $h_time;
+}
+
+static public function formatBytes($bytes, $precision = 2) {
+    $units = array('B', 'KB', 'MB', 'GB', 'TB');
+
+    $bytes = max($bytes, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+
+    $bytes /= pow(1024, $pow);
+
+    return round($bytes, $precision) . ' ' . $units[$pow];
+}
+
     public static function commonPrefix($str1, $str2) {
         $limit = min(strlen($str1), strlen($str2));
         for ($i = 0; $i < $limit && $str1[$i] === $str2[$i]; $i++);
         return substr($str1, 0, $i);
     }
-    
+
     /**
      * This is a simplified wp_send_json made compatible with WP 3.2.x to 3.4.x
      * @param type $response
@@ -53,7 +112,10 @@ class ShortPixelTools {
     public static function sendJSON($response) {
         @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
         die(json_encode($response));
+        //wp_send_json($response); // send json proper, dies.
     }
+
+
 
     /**
      * finds if an array contains an item, comparing the property given as key
@@ -69,7 +131,7 @@ class ShortPixelTools {
             }
         }
         return false;
-    }    
+    }
 }
 
 function ShortPixelVDD($v){

@@ -5,6 +5,10 @@
  * Time: 13:44
  */
 
+ use ShortPixel\ShortPixelLogger\ShortPixelLogger as Log;
+ use ShortPixel\FileModel as FileModel;
+ use ShortPixel\Directorymodel as DirectoryModel;
+
 //TODO decouple from directly using WP metadata, in order to be able to use it for custom images
 class ShortPixelPng2Jpg {
     private $_settings = null;
@@ -22,7 +26,11 @@ class ShortPixelPng2Jpg {
 
         //WPShortPixel::log("PNG2JPG SHELL EXEC: " . shell_exec('convert ' . $image . ' -format "%[opaque]" info:'));
 
-        if (!file_exists($image) || ord(file_get_contents($image, false, null, 25, 1)) & 4) {
+        if (!file_exists($image)) {
+            WPShortPixel::log("PNG2JPG FILE MISSING:  " . $image);
+            $transparent = 1;
+        } elseif(ord(file_get_contents($image, false, null, 25, 1)) & 4) {
+            WPShortPixel::log("PNG2JPG: 25th byte has thrid bit 1 - transparency");
             $transparent = 1;
         } else {
             $contents = file_get_contents($image);
@@ -36,7 +44,7 @@ class ShortPixelPng2Jpg {
                 $img = @imagecreatefrompng($image);
                 WPShortPixel::log("PNG2JPG created from png");
                 if(!$img) {
-                    WPShortPixel::log("PNG2JPG not a PNG");
+                    WPShortPixel::log("PNG2JPG not a PNG, imagecreatefrompng failed ");
                     $transparent = true; //it's not a PNG, can't convert it
                 } else {
                     WPShortPixel::log("PNG2JPG is PNG");
@@ -55,7 +63,7 @@ class ShortPixelPng2Jpg {
                     }
                 }
             }
-        }
+        } // non-transparant.
 
         WPShortPixel::log("PNG2JPG is " . (!$transparent && !$transparent_pixel ? " not" : "") . " transparent");
         //pass on the img too, if it was already loaded from PNG, matter of performance
@@ -73,6 +81,8 @@ class ShortPixelPng2Jpg {
 
     protected function doConvertPng2Jpg($params, $backup, $suffixRegex = false, $img = false) {
         $image = $params['file'];
+        $fs = \wpSPIO()->filesystem();
+
         WPShortPixel::log("PNG2JPG doConvert $image");
         if(!$img) {
             WPShortPixel::log("PNG2JPG doConvert create from PNG");
@@ -83,32 +93,38 @@ class ShortPixelPng2Jpg {
             }
         }
 
-        WPShortPixel::log("PNG2JPG doConvert img ready");
+      //  WPShortPixel::log("PNG2JPG doConvert img ready");
         $x = imagesx($img);
         $y = imagesy($img);
         WPShortPixel::log("PNG2JPG doConvert width $x height $y");
         $bg = imagecreatetruecolor($x, $y);
-        WPShortPixel::log("PNG2JPG doConvert img created truecolor");
+    //    WPShortPixel::log("PNG2JPG doConvert img created truecolor");
         if(!$bg) return (object)array("params" => $params, "unlink" => false);
         imagefill($bg, 0, 0, imagecolorallocate($bg, 255, 255, 255));
         imagealphablending($bg, 1);
         imagecopy($bg, $img, 0, 0, 0, 0, $x, $y);
         imagedestroy($img);
-        $newPath = preg_replace("/\.png$/i", ".jpg", $image);
-        $newUrl = preg_replace("/\.png$/i", ".jpg", $params['url']);
-        for ($i = 1; file_exists($newPath); $i++) {
-            if($suffixRegex) {
-                $newPath = preg_replace("/(" . $suffixRegex . ")\.png$/i", $i . '-$1.jpg', $image);
-            }else {
-                $newPath = preg_replace("/\.png$/i", "-" . $i . ".jpg", $image);
-            }
-        }
+        //$newPath = preg_replace("/\.png$/i", ".jpg", $image);
+
+        $fsFile = $fs->getFile($image); // the original png file
+        $filename = $fsFile->getFileName();
+        $newFileName = $fsFile->getFileBase() . '.jpg'; // convert extension to .png
+
+        $fsNewFile = $fs->getFile($fsFile->getFileDir() . $newFileName);
+
+        $uniquefile = $this->unique_file( $fsFile->getFileDir(), $fsNewFile);
+        $newPath =  $uniquefile->getFullPath(); //(string) $fsFile->getFileDir() . $uniquepath;
+
+        // check old filename, replace with uniqued filename.
+        $newUrl = str_replace($filename, $uniquefile->getFileName(), $params['url']); //preg_replace("/\.png$/i", ".jpg", $params['url']);
+
         if (imagejpeg($bg, $newPath, 90)) {
             WPShortPixel::log("PNG2JPG doConvert created JPEG at $newPath");
             $newSize = filesize($newPath);
             $origSize = filesize($image);
-            if($newSize > $origSize * 0.95) {
+            if($newSize > $origSize * 0.95 || $newSize == 0) {
                 //if the image is not 5% smaller, don't bother.
+                //if the size is 0, a conversion (or disk write) problem happened, go on with the PNG
                 WPShortPixel::log("PNG2JPG converted image is larger ($newSize vs. $origSize), keeping the PNG");
                 unlink($newPath);
                 return (object)array("params" => $params, "unlink" => false);
@@ -145,6 +161,30 @@ class ShortPixelPng2Jpg {
         return (object)array("params" => $params, "unlink" => $image);
     }
 
+    /** Own function to get a unique filename since the WordPress wp_unique_filename seems to not function properly w/ thumbnails */
+    private function unique_file(DirectoryModel $dir, FileModel $file, $number = 0)
+    {
+      if (! $file->exists())
+        return $file;
+
+      $number = 0;
+      $fs = \wpSPIO()->filesystem();
+
+      $base = $file->getFileBase();
+      $ext = $file->getExtension();
+
+      while($file->exists())
+      {
+        $number++;
+        $numberbase = $base . '-' . $number;
+        Log::addDebug('check for unique file -- ' . $dir->getPath() . $numberbase . '.' . $ext);
+        $file = $fs->getFile($dir->getPath() . $numberbase . '.' . $ext);
+      }
+
+      return $file;
+
+    }
+
     protected function isExcluded($params) {
         if(is_array($this->_settings->excludePatterns)) {
             foreach($this->_settings->excludePatterns as $item) {
@@ -162,7 +202,7 @@ class ShortPixelPng2Jpg {
 
     /**
      * Convert an uploaded image from PNG to JPG
-     * @param type $params
+     * @param type $params ( file, url, type )  - Connected to https://developer.wordpress.org/reference/hooks/wp_handle_upload/
      * @return string
      */
     public function convertPng2Jpg($params) {
@@ -174,7 +214,7 @@ class ShortPixelPng2Jpg {
         if($this->isExcluded($params)) { return $params; }
 
         $image = $params['file'];
-        WPShortPixel::log("Convert Media PNG to JPG on upload: {$image}");
+        Log::addDebug("Convert Media PNG to JPG on upload: {$image}");
 
         if($this->_settings->png2jpg == 2) {
             $doConvert = true;
@@ -214,6 +254,8 @@ class ShortPixelPng2Jpg {
 
         $meta = $itemHandler->getRawMeta();
         $ID = $itemHandler->getId();
+        $fs = \wpSPIO()->filesystem();
+
         if(!$this->_settings->png2jpg || !isset($meta['file']) || strtolower(substr($meta['file'], -4)) !== '.png') {
             return ;
         }
@@ -221,8 +263,9 @@ class ShortPixelPng2Jpg {
 
         WPShortPixel::log("Send to processing: Convert Media PNG to JPG #{$ID} META: " . json_encode($meta));
 
-        $image = $meta['file'];
-        $imagePath = get_attached_file($ID);
+        $image = $meta['file']; // This is not a full path!
+        $imageFile = $fs->getAttachedFile($ID);
+        $imagePath = $imageFile->getFullPath(); // This is a full path.
         $basePath = trailingslashit(str_replace($image, "", $imagePath));
         $imageUrl = wp_get_attachment_url($ID);
         $baseUrl = self::removeUrlProtocol(trailingslashit(str_replace($image, "", $imageUrl))); //make the base url protocol agnostic if it's not already
@@ -230,7 +273,7 @@ class ShortPixelPng2Jpg {
         // set a temporary error in order to make sure user gets something if the image failed from memory limit.
         if(   isset($meta['ShortPixel']['Retries']) && $meta['ShortPixel']['Retries'] > 3
            && isset($meta['ShortPixel']['ErrCode']) && $meta['ShortPixel']['ErrCode'] == ShortPixelAPI::ERR_PNG2JPG_MEMORY) {
-            WPShortPixel::log("PNG2JPG too many memory failures!");
+            Log::addWarn("PNG2JPG too many memory failures!");
             throw new Exception('Not enough memory to convert from PNG to JPG.', ShortPixelAPI::ERR_PNG2JPG_MEMORY);
         }
         $meta['ShortPixelImprovement'] = 'Error: <i>Not enough memory to convert from PNG to JPG.</i>';
@@ -240,22 +283,24 @@ class ShortPixelPng2Jpg {
         $meta['ShortPixel']['Retries'] = isset($meta['ShortPixel']['Retries']) ? $meta['ShortPixel']['Retries'] + 1 : 1;
         $meta['ShortPixel']['ErrCode'] = ShortPixelAPI::ERR_PNG2JPG_MEMORY;
         //wp_update_attachment_metadata($ID, $meta);
+
         update_post_meta($ID, '_wp_attachment_metadata', $meta);
 
         if($this->_settings->png2jpg == 2) {
             $doConvert = true;
         } else {
-            $retC = $this->canConvertPng2Jpg($image);
+            $retC = $this->canConvertPng2Jpg($imagePath);
+
             $doConvert =  $retC['notTransparent'];
         }
         if (!$doConvert) {
-            WPShortPixel::log("PNG2JPG not a PNG");
+            Log::addDebug("PNG2JPG not a PNG, or transparent when this setting is off - " . $imagePath);
             return $meta; //cannot convert it
         }
 
-        WPShortPixel::log(" CONVERTING MAIN: $imagePath");
+        Log::addDebug(" CONVERTING MAIN: $imagePath");
         $retMain = $this->doConvertPng2Jpg(array('file' => $imagePath, 'url' => false, 'type' => 'image/png'), $this->_settings->backupImages, false, isset($retC['img']) ? $retC['img'] : false);
-        WPShortPixel::log("PNG2JPG doConvert Main RETURNED " . json_encode($retMain));
+        Log::addDebug("PNG2JPG doConvert Main RETURNED " . json_encode($retMain));
         $ret = $retMain->params;
         $toUnlink = array();
         $toReplace = array();
@@ -269,29 +314,30 @@ class ShortPixelPng2Jpg {
 
         if ($ret['type'] == 'image/jpeg') {
             $toUnlink[] = $retMain->unlink;
+            do_action('shortpixel/image/convertpng2jpg_before', $ID, $meta);
             //convert to the new URLs the urls in the existing posts.
             $baseRelPath = trailingslashit(dirname($image));
             $toReplace[self::removeUrlProtocol($imageUrl)] = $baseUrl . $baseRelPath . wp_basename($ret['file']);
             $pngSize = $ret['png_size'];
             $jpgSize = $ret['jpg_size'];
-            WPShortPixel::log(" IMAGE PATH: $imagePath");
+            Log::addDebug(" IMAGE PATH: $imagePath");
             $imagePath = isset($ret['original_file']) ? $ret['original_file'] : $imagePath;
-            WPShortPixel::log(" SET IMAGE PATH: $imagePath");
+            Log::addDebug(" SET IMAGE PATH: $imagePath");
 
             //conversion succeeded for the main image, update meta and proceed to thumbs. (It could also not succeed if the converted file is not smaller)
             $duplicates = $this->updateFileAlsoInWPMLDuplicates($ID, $meta, str_replace($basePath, '', $ret['file']));
-            WPShortPixel::log(" WPML duplicates: " . json_encode($duplicates));
+            Log::addDebug(" WPML duplicates: " . json_encode($duplicates));
 
             $originalSizes = isset($meta['sizes']) ? $meta['sizes'] : array();
             $filesConverted = array();
             foreach($meta['sizes'] as $size => $info) {
                 if(isset($filesConverted[$info['file']])) {
-                    WPShortPixel::log("PNG2JPG DUPLICATED THUMB: " . $size);
+                    Log::addDebug("PNG2JPG DUPLICATED THUMB: " . $size);
                     if($filesConverted[$info['file']] === false) {
-                        WPShortPixel::log("PNG2JPG DUPLICATED THUMB not converted");
+                        Log::addDebug("PNG2JPG DUPLICATED THUMB not converted");
                         continue;
                     }
-                    WPShortPixel::log("PNG2JPG DUPLICATED THUMB already converted");
+                    Log::addDebug("PNG2JPG DUPLICATED THUMB already converted");
                     $rett = $filesConverted[$info['file']];
                 } else {
                     $retThumb = $this->doConvertPng2Jpg(array('file' => $basePath . $baseRelPath . $info['file'], 'url' => false, 'type' => 'image/png'),
@@ -299,15 +345,15 @@ class ShortPixelPng2Jpg {
                     $rett = $retThumb->params;
                 }
 
-                WPShortPixel::log("PNG2JPG doConvert thumb RETURNED " . json_encode($rett));
+                Log::addDebug("PNG2JPG doConvert thumb RETURNED " . json_encode($rett));
                 if ($rett['type'] == 'image/jpeg') {
                     $toUnlink[] = $retThumb->unlink;
-                    WPShortPixel::log("PNG2JPG thumb is jpg");
+                    Log::addDebug("PNG2JPG thumb is jpg");
                     $pngSize += $rett['png_size'];
                     $jpgSize += $rett['jpg_size'];
-                    WPShortPixel::log("PNG2JPG total PNG size: $pngSize total JPG size: $jpgSize");
+                    Log::addDebug("PNG2JPG total PNG size: $pngSize total JPG size: $jpgSize");
                     $originalSizes[$size]['file'] = wp_basename($rett['file'], '.jpg') . '.png';
-                    WPShortPixel::log("PNG2JPG thumb original: " . $originalSizes[$size]['file']);
+                    Log::addDebug("PNG2JPG thumb original: " . $originalSizes[$size]['file']);
                     $toReplace[$baseUrl . $baseRelPath . $info['file']] = $baseUrl . $baseRelPath . wp_basename($rett['file']);
 
                     $filesConverted[$info['file']] = $rett;
@@ -316,22 +362,30 @@ class ShortPixelPng2Jpg {
                     $filesConverted[$info['file']] = false;
                 }
             }
-            $meta['ShortPixelPng2Jpg'] = array('originalFile' => $imagePath, 'originalSizes' => $originalSizes, 'originalSizes2' => $originalSizes,
+            $meta['ShortPixelPng2Jpg'] = array('originalFile' => $imagePath, 'originalSizes' => $originalSizes,
                 'backup' => $this->_settings->backupImages,
                 'optimizationPercent' => round(100.0 * (1.00 - $jpgSize / $pngSize)));
             //wp_update_attachment_metadata($ID, $meta);
             update_post_meta($ID, '_wp_attachment_metadata', $meta);
-            WPShortPixel::log("Updated meta: " . json_encode($meta));
+            $itemHandler->deleteItemCache(); // remove cache since filetype changes.
+            Log::addDebug("Updated meta: " . json_encode($meta));
+            do_action('shortpixel/image/convertpng2jpg_after', $ID, $meta);
         }
 
-        self::png2JpgUpdateUrls(array(), $toReplace);
+        if(count($toReplace)) {
+            self::png2JpgUpdateUrls(array(), $toReplace);
+        }
+        $fs = \wpSPIO()->filesystem();
+
         foreach($toUnlink as $unlink) {
             if($unlink) {
-                WPShortPixel::log("PNG2JPG unlink $unlink");
-                @unlink($unlink);
+                Log::addDebug("PNG2JPG remove file $unlink");
+                $fileObj = $fs->getFile($unlink);
+                $fileObj->delete();
+//                @unlink($unlink);
             }
         }
-        WPShortPixel::log("PNG2JPG done. Return: " . json_encode($meta));
+        Log::addDebug("PNG2JPG done. Return: " . json_encode($meta));
 
         return $meta;
     }
@@ -383,7 +437,7 @@ class ShortPixelPng2Jpg {
      */
     public static function png2JpgUpdateUrls($options, $map){
         global $wpdb;
-        WPShortPixel::log("PNG2JPG update URLS " . json_encode($map));
+        Log::addDebug("PNG2JPG update URLS " . json_encode($map));
         $results = array();
         $queries = array(
             'content' =>		array("UPDATE $wpdb->posts SET post_content = replace(post_content, %s, %s)",  __('Content Items (Posts, Pages, Custom Post Types, Revisions)','shortpixel-image-optimiser') ),
@@ -396,8 +450,9 @@ class ShortPixelPng2Jpg {
         if(count($options) == 0) {
             $options = array_keys($queries);
         }
+        $startTime = microtime(true);
         foreach($options as $option){
-            WPShortPixel::log("PNG2JPG update URLS on $option ");
+          //  WPShortPixel::log("PNG2JPG update URLS on $option ");
             if( $option == 'custom' ){
                 $n = 0;
                 $page_size = WpShortPixelMediaLbraryAdapter::getOptimalChunkSize('postmeta');
@@ -421,6 +476,16 @@ class ShortPixelPng2Jpg {
                             $fix = $wpdb->query("UPDATE $wpdb->postmeta SET meta_value = '".$edited->data."' WHERE meta_id = ".$item->meta_id );
                             if( $fix )
                                 $n++;
+                        }
+                    }
+                    //check time. This loop could take long because it's scanning all the postmeta table which in some cases becomes huge...
+                    $timeElapsed = microtime(true) - $startTime;
+                    if($timeElapsed > SHORTPIXEL_MAX_EXECUTION_TIME / 2) {
+                        //try to add some time or get out if not
+                        if(set_time_limit(SHORTPIXEL_MAX_EXECUTION_TIME)) {
+                            $startTime += SHORTPIXEL_MAX_EXECUTION_TIME / 2;
+                        } else {
+                            break;
                         }
                     }
                 }

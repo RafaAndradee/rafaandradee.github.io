@@ -1,10 +1,10 @@
-=== WooCommerce Correios ===
+=== Claudio Sanches - Correios for WooCommerce ===
 Contributors: claudiosanches, rodrigoprior, matheuscl
 Donate link: https://claudiosanches.com/doacoes/
 Tags: shipping, delivery, woocommerce, correios
 Requires at least: 4.0
-Tested up to: 4.9
-Stable tag: 3.7.1
+Tested up to: 5.3
+Stable tag: 3.8.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -17,7 +17,7 @@ Utilize os métodos de entrega e serviços dos Correios com a sua loja WooCommer
 
 [Correios](http://www.correios.com.br/) é um método de entrega brasileiro.
 
-O plugin WooCommerce Correios foi desenvolvido sem nenhum incentivo dos Correios. Nenhum dos desenvolvedores deste plugin possuem vínculos com esta empresa. E note que este plugin foi feito baseado na documentação do [Webservices Correios](http://www.correios.com.br/webservices/) e com apoio da [Infranology](http://infranology.com.br/) na construção das classes de cubagem.
+Este plugin foi desenvolvido sem nenhum incentivo dos Correios. Nenhum dos desenvolvedores deste plugin possuem vínculos com esta empresa. E note que este plugin foi feito baseado na documentação do [Webservices Correios](https://www.correios.com.br/precos-e-prazos/calculador-remoto-de-precos-e-prazos) e com apoio da [Infranology](http://infranology.com.br/) na construção das classes de cubagem.
 
 = Serviços integrados =
 
@@ -204,6 +204,19 @@ Em caso de dúvidas, basta abrir um tópico no [fórum de suporte do plugin](htt
 
 == Changelog ==
 
+= 3.8.0 - 2019/09/20 =
+
+- Nome do plugin atualizado de "WooCommerce Correios" para "Claudio Sanches - Correios for WooCommerce".
+- Atualizado limites de peso para Impresso normal, Registro Módico e Registro Nacional.
+- Corrigida rotina de atualização das opções do plugin.
+
+= 3.7.2 - 2019/05/06 =
+
+- Correção dos links que levam para a página de rastreio de encomenda.
+- Corrigido problema com código incorreto vindo do Webservice dos Correios impossibilitando mostrar o frete corretamente.
+- Atualizado valores do Impresso normal, Registro Módico e Registro Nacional para tabela de 01/08/2018.
+- Corrigido os valores de altura e comprimento que estavamos trocados.
+
 = 3.7.1 - 2018/05/11 =
 
 - Melhorado o comportamento quando login e senha para tabela de rastreamento estão incorretos.
@@ -220,11 +233,8 @@ Em caso de dúvidas, basta abrir um tópico no [fórum de suporte do plugin](htt
 
 == Upgrade Notice ==
 
-= 3.7.1 =
+= 3.8.0 =
 
-- Atualizados os valores do Impresso e Carta.
-- Adicionada opção para peso extra nos métodos de Impresso e Carta.
-- Adicionada opções para usar rastreamento com dados administrativos.
-- Melhorado a exibição e salvamento da estimativa de entrega.
-- Melhorado o comportamento quando login e senha para tabela de rastreamento estão incorretos.
-- Melhorada a descrição para opção de integração com tabela de rastreamento.
+- Nome do plugin atualizado de "WooCommerce Correios" para "Claudio Sanches - Correios for WooCommerce".
+- Atualizado limites de peso para Impresso normal, Registro Módico e Registro Nacional.
+- Corrigida rotina de atualização das opções do plugin.
