@@ -1,6 +1,7 @@
 <?php
+
 /** Settings Model **/
-class WPShortPixelSettings extends ShortPixel\ShortPixelModel {
+class WPShortPixelSettings extends \ShortPixel\Model {
     private $_apiKey = '';
     private $_compressionType = 1;
     private $_keepExif = 0;
@@ -46,6 +47,7 @@ class WPShortPixelSettings extends ShortPixel\ShortPixelModel {
         'cloudflareEmail'   => array( 'key' => 'wp-short-pixel-cloudflareAPIEmail', 'default' => '', 'group' => 'options'),
         'cloudflareAuthKey' => array( 'key' => 'wp-short-pixel-cloudflareAuthKey', 'default' => '', 'group' => 'options'),
         'cloudflareZoneID'  => array( 'key' => 'wp-short-pixel-cloudflareAPIZoneID', 'default' => '', 'group' => 'options'),
+        'cloudflareToken'   => array( 'key' => 'wp-short-pixel-cloudflareToken', 'default' => '', 'group' => 'options'),
 
         //optimize other images than the ones in Media Library
         'includeNextGen' => array('key' => 'wp-short-pixel-include-next-gen', 'default' => null, 'group' => 'options'),
@@ -77,6 +79,8 @@ class WPShortPixelSettings extends ShortPixel\ShortPixelModel {
         'mediaLibraryViewMode' => array('key' => 'wp-short-pixel-view-mode', 'default' => null, 'group' => 'state'),
         'redirectedSettings' => array('key' => 'wp-short-pixel-redirected-settings', 'default' => null, 'group' => 'state'),
         'convertedPng2Jpg' => array('key' => 'wp-short-pixel-converted-png2jpg', 'default' => array(), 'group' => 'state'),
+        'helpscoutOptin' => array('key' => 'wp-short-pixel-helpscout-optin', 'default' => -1, 'group' => 'state'),
+
 
         //bulk state machine
         'bulkType' => array('key' => 'wp-short-pixel-bulk-type', 'default' => null, 'group' => 'bulk'),
@@ -132,9 +136,11 @@ class WPShortPixelSettings extends ShortPixel\ShortPixelModel {
         'cloudflareEmail' => array('s' => 'string'), // string
         'cloudflareAuthKey' => array('s' => 'string'), // string
         'cloudflareZoneID' => array('s' => 'string'), // string
+        'cloudflareToken' => array('s' => 'string'),
         'savedSpace' => array('s' => 'skip'),
         'fileCount' => array('s' => 'skip'), // int
         'under5Percent' => array('s' => 'skip'), // int
+        'helpscoutOptin' => array('s' => 'boolean'), // checkbox
     );
 
     // @todo Eventually, this should not happen onLoad, but on demand.
@@ -179,11 +185,13 @@ class WPShortPixelSettings extends ShortPixel\ShortPixelModel {
         delete_option( 'wp-short-pixel-bulk-last-status');
         delete_option( 'wp-short-pixel-current-total-files');
         delete_option(self::$_optionsMap['removeSettingsOnDeletePlugin']['key']);
-        $dismissed = get_option('wp-short-pixel-dismissed-notices', array());
+        // Dismissed now via Notices Controller.
+      /*  $dismissed = get_option('wp-short-pixel-dismissed-notices', array());
         if(isset($dismissed['compat'])) {
             unset($dismissed['compat']);
             update_option('wp-short-pixel-dismissed-notices', $dismissed, 'no');
-        }
+        } */
+
         $formerPrio = get_option('wp-short-pixel-priorityQueue');
         $qGet = (! defined('SHORTPIXEL_NOFLOCK')) ?  ShortPixelQueue::get() : ShortPixelQueueDB::get();
         if(is_array($formerPrio) && !count($qGet)) {
@@ -281,4 +289,34 @@ class WPShortPixelSettings extends ShortPixel\ShortPixelModel {
             }
         }
     }
-}
+
+    public function ajax_helpscoutOptin()
+    {
+       $toggle = isset($_POST['toggle']) ? sanitize_text_field($_POST['toggle']) : false;
+       $response = array('Status' => 'fail');
+       $settings = \wpSPIO()->settings();
+
+       if (! $toggle)
+       {
+           $response['Status'] = 'No Toggle';
+       }
+
+       if ($toggle == 'off')
+       {
+         $settings->helpscoutOptin = 0;
+         $response['Status'] = 'success';
+       }
+       elseif($toggle == 'on')
+       {
+         $settings->helpscoutOptin = 1;
+         $response['Status'] = 'success';
+       }
+       else
+       {
+         $response['Status'] = 'No valid Toggle';
+       }
+
+       wp_send_json($response);
+       exit();
+    }
+} // class

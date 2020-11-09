@@ -87,8 +87,6 @@ footer{
 
     width: 100%;
     z-index: 5;
-    position: absolute;
-    padding: 21px 0 0 0;
 }
 
 
@@ -172,7 +170,7 @@ footer{
 /*/////// HERO ///////*/
 
 #hero {
-    background-image: url(assets/images/hero.png);
+    background-image: url(assets/images/bg-hero.png);
     background-size: cover;
     height: 100vh;
     width: 100%;

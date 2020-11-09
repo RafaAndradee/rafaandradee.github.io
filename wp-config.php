@@ -93,7 +93,11 @@ $table_prefix  = 'wp_';
  */
 define('WP_DEBUG', true);
 
+define( 'ALLOW_UNFILTERED_UPLOADS', true );
+
 /* That's all, stop editing! Happy blogging. */
+define( 'ALLOW_UNFILTERED_UPLOADS', true );
+
 
 /** Absolute path to the WordPress directory. */
 if ( !defined('ABSPATH') )

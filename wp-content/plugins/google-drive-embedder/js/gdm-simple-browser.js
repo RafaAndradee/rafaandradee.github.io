@@ -90,7 +90,7 @@ GdmSimpleFileBrowser = (function($) {
         var htmlItem = $('<div class="gdm-drivefile-div" />');
 
         var iconSpan = $('<span class="gdm-drivefile-icon" />')
-            .append($(links.icon.url ? '<img src="' + links.icon.url + '" width="16" height="16" '
+            .append($(links.icon.url ? '<img alt="" src="' + links.icon.url + '" width="16" height="16" '
             + (links.icon.color ? ' style="background-color: ' + links.icon.color + '" ' : '') + ' />'
                 : '<span style="width: 16px; height: 16px; background-color: ' + links.icon.color + '" />'));
         var titleSpan = $('<span class="gdm-drivefile-title" />')

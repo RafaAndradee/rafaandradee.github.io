@@ -2,8 +2,8 @@
 Contributors: levertechadmin
 Tags: drive, google, document, google apps, g suite, google drive, sso, auth, intranet, embed
 Requires at least: 4.0
-Tested up to: 5.3.1
-Stable tag: 5.2
+Tested up to: 5.5.1
+Stable tag: 5.2.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -55,7 +55,7 @@ This means you no longer need to manage Drive and your Intranet as two completel
 It also introduces advanced *interactive embedded folders*, where users can preview files and drill-down into subfolders all without 
 leaving your site.
 
-It also contains all the features of the basic and premium versions, plus support for *Team Drives*.
+It also contains all the features of the basic and premium versions, plus support for *Team Drives (Shared Drives)*.
 
 [Enterprise - Find out more](http://wp-glogin.com/drive/enterprise/?utm_source=Drive%20ReadmeEntPromo&utm_medium=freemium&utm_campaign=Freemium)
 
@@ -259,6 +259,20 @@ or upload the ZIP file directly in the Plugins section of your Wordpress admin
 1. Follow the instructions to configure the Google Apps Login plugin post-installation
 
 == Changelog ==
+
+=5.2.3=
+
+Added compatibility for Wordpress 5.5.1
+
+=5.2.2=
+
+Updated Team Drive to Shared Drive in compliance of Google Drive updates.
+Added compatibility for Wordpress 5.4.1
+
+=5.2.1=
+
+Added American with Disabilities Act compliance compatibility for google drive embedder folder and files icons
+Added compatibility for Wordpress 5.3.2
 
 =5.2=
 
