@@ -9,7 +9,7 @@
 		<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 			
 			<li class="jobSquare">
-			<a href="<?php the_permalink() ?>">
+			<a target="_blank" href="<?php the_permalink() ?>">
 				<h3 class="titleJob"><?php the_title(); ?></h3>
 				<?php the_post_thumbnail('gridhome'); ?>
 			</a>
