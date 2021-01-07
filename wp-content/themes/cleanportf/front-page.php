@@ -13,10 +13,7 @@
 		</div>	
 	</div>
 
-	<div id="blog">
-		<?php get_template_part( 'template-parts/grid-blog' ); ?>
-	</div>
-
+	
 	<div id="posts-blog">		
 		<?php get_template_part( 'template-parts/posts-blog' ); ?>
 	</div>

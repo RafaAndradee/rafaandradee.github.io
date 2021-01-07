@@ -21,12 +21,12 @@ display:none;
 
 body {
     background-color: #FFF;
-    font-family: 'Oswald', sans-serif;
+    font-family: 'raleway', sans-serif;
 }
 
 
 body h3{
-    font-family: 'Oswald', sans-serif;
+    font-family: 'raleway', sans-serif;
     text-transform: uppercase;
 }
 
@@ -163,8 +163,8 @@ footer{
 }
 
 .navbar li a{
-    font-family: 'Oswald', sans-serif;
     text-transform: uppercase;
+    font-weight: 600;
     color: #fff;
 }
 /*/////// HERO ///////*/
@@ -241,33 +241,84 @@ footer{
 }
 
 
-.headlineHome {
-    color: #fff;
+.wrapPresentationBox{
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.presentationBox img{
+    width: 100%;
 }
 
 
+.presentationBox h1 {
+    margin: 112px -22px 84px 77px;
+    width: 100%;
+    color: #fff;
+    font-weight: 700;
+    z-index: 999;
+}
 
-.headlineHome h3{
-    vertical-align: middle;
-    height: auto;
-    padding: 2rem 0 27px 0;
+.presentationBox h1 span {
+    color: #fd2121;
+}
+
+.presentationBox {
+    width: 33.3%;
+}
+
+
+.WrapIconPress {
+    width: 100%;
+    display: inline-flex;
+}
+
+
+.iconPres{
+    width: 33.3%; 
+}
+
+.phoneButton {
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    background: #007bff;
+    color: #fff;
+    margin: 5px 0 11px 0px;
+    text-align: center;
+}
+
+
+.fab{
+	font-size: 2em;
+	color: #2198C5;
+}
+
+
+.mySelfie {
+    padding: 31px;
+    background-image: linear-gradient(#ea1e31, #80008000, #80008000, #363573, #363573);
+}
+
+.realize{
+
+}
+
+.presentationBox, .presentationBox p {
+    color: #2198C5;
     /*! text-align: right; */
-    position: static;
     font-weight: 100;
-    text-transform: unset;
-    font-family: 'Oswald', sans-serif;
+    font-family: 'Raleway', sans-serif;
     animation: fadeLogo 6s;
+    text-align: left;
     }
+
 
 .iconScroll {
     width: 25px;
 }
 
-.headlineHome p{
 
-    float: left;
-    padding: 3% 0 0 2%;
-}
 .containerHeadlineHome{
 
     background-color: #99294D;
@@ -460,7 +511,6 @@ footer{
 
 .blogTexto h1{
 
-    font-family: Oswald, sans-serif;
     text-transform: uppercase;
 
     text-align: left;
@@ -550,6 +600,11 @@ footer{
     font-size: 0.8rem;
 }
 
+footer {
+    background: #007bff;
+}
+
+
 /*/////// REDES SOCIAIS ///////*/
 
 @font-face {
@@ -621,7 +676,7 @@ footer{
     -moz-border-radius: 84px;
     border-radius: 84px;
     margin-right: 10px;
-    color: #c99292;
+    color: #fff;
     background-color: #251d57;
 }
 
@@ -654,7 +709,10 @@ footer{
 
 .direitosAutorais{
     text-align: center;
-    /*! color: #fff; */
+}
+
+.direitosAutorais p{
+    color: #fff !important;
 }
 
 
@@ -671,9 +729,34 @@ footer{
     height: auto;
     }
 
-
 }
 
+@media (min-width: 1024px) {
+    .presentationBoxBottom{
+        display: none;
+    }
+
+    #lineFooter {
+        display: none;
+    }
+ }
+
+@media (max-width: 1024px) {
+    
+    .presentationBox:first-child p{
+        display: none;
+    }    
+
+    .presentationBox:first-child a{
+        display: none;
+    }  
+
+    .presentationBox:first-child .WrapIconPress{
+        display: none;
+    }
+    
+
+}
 
 @media (min-height: 1280px) {
     .responsiveimg{
@@ -684,8 +767,30 @@ footer{
     .thumbSingle {
     width: 100%;
     height: 40vh;
+    }
+
 }
+
+@media (max-width: 768px)  {
+    .presentationBox:first-child{
+        display: none;
+    }
+
+    .pb2 {
+        width: 10%;
+    }
+
+    .pb2 {
+        width: 10%;
+    }
+
+    .pb3 {
+        width: 80%;
+    }
+
+    
 }
+
 
 @media (max-width: 540px)  {
     .conteudo-post img{
